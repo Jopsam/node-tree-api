@@ -1,59 +1,87 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Nodes API - Backend Technical Test
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Description
 
-## About Laravel
+This REST API allows managing a **tree of nodes** with the following operations:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Create nodes (root or child)  
+- List root nodes  
+- List children of a node (with optional depth)  
+- Delete nodes (only leaf nodes)  
+- Title translation using `Accept-Language` header  
+- Convert `created_at` timestamps to a timezone using `Time-Zone` header  
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+All nodes are stored in a **database** and preloaded using a **Seeder**.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- PHP >= 8.2  
+- Composer  
+- Docker + Docker Compose (if using Sail)  
+- Laravel 12
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## Installation
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. Clone the repository:
 
-### Premium Partners
+```bash
+git clone <git@github.com:Jopsam/node-tree-api.git>
+cd <your-repo-folder>
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+2. Copy `.env.example` to `.env` and configure environment variables if needed:
 
-## Contributing
+```bash
+cp .env.example .env
+```
+3. Install PHP dependencies:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+```
 
-## Code of Conduct
+4. Start Sail / Docker:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+./vendor/bin/sail up -d
+```
 
-## Security Vulnerabilities
+5. Run migrations and seeders:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+./vendor/bin/sail artisan migrate --seed
+```
 
-## License
+## Automated Tests
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### PHPUnit
+
+**Run a single test file:**
+
+```bash
+./vendor/bin/sail test tests/Feature/NodeApiTest.php
+```
+
+**Run a single test method:**
+
+```bash
+./vendor/bin/sail test --filter=test_it_creates_a_root_node
+```
+
+## Postman Docs
+
+<a href="https://documenter.getpostman.com/view/21246879/2sBXViiWKQ" target="_blank">https://documenter.getpostman.com/view/21246879/2sBXViiWKQ</a>
+
+
+## Important Notes
+
+- `children` is **always returned** as an array, even for leaf nodes.  
+- `depth` limits the recursion of children.  
+- `Accept-Language` supports ISO 639-1 (`es`, `en`).  
+- `Time-Zone` supports any valid PHP timezone (`America/Bogota`, `UTC`, etc).  
+- PHPUnit tests cover node creation, listing, translation, timezone conversion, and deletion.
+
