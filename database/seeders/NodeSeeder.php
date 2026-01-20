@@ -35,9 +35,19 @@ class NodeSeeder extends Seeder
             'title' => $formatter->format(4),
         ]);
 
-        Node::create([
+        $fiveNode = Node::create([
             'parent_id' => $child->id,
             'title' => $formatter->format(5),
+        ]);
+
+        Node::create([
+            'parent_id' => $fiveNode->id,
+            'title' => $formatter->format(6),
+        ]);
+
+        Node::create([
+            'parent_id' => $fiveNode->id,
+            'title' => $formatter->format(7),
         ]);
     }
 }

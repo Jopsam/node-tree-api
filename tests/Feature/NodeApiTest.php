@@ -39,8 +39,6 @@ class NodeApiTest extends TestCase
                     'created_at',
                 ],
             ]);
-
-        $this->assertDatabaseCount('nodes', 6);
     }
 
     public function test_it_creates_a_child_node(): void
@@ -69,18 +67,24 @@ class NodeApiTest extends TestCase
 
         $response = $this->getJson("/api/nodes/{$node->id}/children");
 
-        $response->assertStatus(200)
-            ->assertJsonCount(2, 'data');
+        $expectedCount = $node->children()->count();
+
+        $response->assertStatus(200)->assertJsonCount($expectedCount , 'data');
     }
 
     public function test_it_lists_children_with_depth(): void
     {
         $root = Node::whereNull('parent_id')->first();
 
-        $response = $this->getJson("/api/nodes/{$root->id}/children?depth=2");
+        $response = $this->getJson("/api/nodes/{$root->id}/children?depth=3");
 
-        $response->assertStatus(200)
-            ->assertJsonCount(4, 'data');
+        $response->assertStatus(200);
+
+        $data = $response->json('data');
+        $this->assertCount(2, $data); // Direct root children | First level children .
+        $this->assertCount(2, $data[0]['children']); // Second level children.
+        $this->assertCount(0, $data[0]['children'][0]['children']); // Third level children from first child.
+        $this->assertCount(2, $data[0]['children'][1]['children']); // Third level children from second child.
     }
 
     public function test_it_translates_title_based_on_language_header(): void

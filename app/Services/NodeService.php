@@ -64,7 +64,9 @@ class NodeService
             ]);
         }
 
-        return $this->loadRecursive($node, $depth);
+        $this->loadRecursive($node, $depth);
+
+        return $node->children;
     }
 
     /**
@@ -89,17 +91,20 @@ class NodeService
      * 
      * @param Node $node
      * @param int $depth
-     * @return Collection
+     * @return void
      */
-    private function loadRecursive(Node $node, int $depth)
+    private function loadRecursive(Node $node, int $depth): void
     {
-        if ($depth === 0) {
-            return collect();
+        if ($depth <= 0) {
+            return;
         }
 
-        return $node->children->flatMap(function ($child) use ($depth) {
-            return collect([$child])
-                ->merge($this->loadRecursive($child, $depth - 1));
-        });
+        if (!$node->relationLoaded('children')) {
+            $node->load('children');
+        }
+
+        foreach ($node->children as $child) {
+            $this->loadRecursive($child, $depth - 1);
+        }
     }
 }

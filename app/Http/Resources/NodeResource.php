@@ -36,6 +36,9 @@ class NodeResource extends JsonResource
                 ->copy()
                 ->timezone($timezone)
                 ->toDateTimeString(),
+            'children' => $this->relationLoaded('children')
+                ? NodeResource::collection($this->children)
+                : [],
         ];
     }
 }
